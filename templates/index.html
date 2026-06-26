@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpamShield AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: linear-gradient(160deg, #eef2ff 0%, #f5f3ff 50%, #fdf2f8 100%);
+    --card: #ffffff;
+    --border: #e8eaf6;
+    --text-primary: #1a1a2e;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
+    --accent: #6366f1;
+    --accent-purple: #8b5cf6;
+    --grad-main: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+    --grad-soft: linear-gradient(135deg, #ede9fe 0%, #fce7f3 100%);
+    --spam-bg: linear-gradient(135deg, #fff1f2, #fff5f5);
+    --spam-border: #fecdd3;
+    --spam-text: #e11d48;
+    --safe-bg: linear-gradient(135deg, #f0fdf4, #f0fff4);
+    --safe-border: #bbf7d0;
+    --safe-text: #16a34a;
+    --shadow: 0 4px 16px rgba(99,102,241,0.10), 0 2px 8px rgba(0,0,0,0.04);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--grad-main);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+  }
+
+  .logo-name { font-size: 16px; font-weight: 700; }
+  .logo-sub { font-size: 11px; color: var(--text-muted); }
+
+  .topbar-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: var(--grad-soft);
+    color: var(--accent-purple);
+    border: 1px solid #e9d5ff;
+  }
+
+  /* LAYOUT */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 24px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  /* FORM */
+  .field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .char-count { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+
+  textarea {
+    width: 100%;
+    background: #fafbff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 12px 14px;
+    outline: none;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 150px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.10);
+    background: #fff;
+  }
+  textarea::placeholder { color: var(--text-muted); }
+
+  .fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 14px 0;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    background: #fafbff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input[type="text"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.10);
+    background: #fff;
+  }
+  input[type="text"]::placeholder { color: var(--text-muted); }
+
+  /* DROP ZONE */
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-sm);
+    padding: 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fafbff;
+    margin-bottom: 16px;
+  }
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--accent);
+    background: #f0f0ff;
+  }
+  .drop-zone-icon { font-size: 24px; margin-bottom: 6px; }
+  .drop-zone-text { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+  .drop-zone-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+  .drop-zone-badges { display: flex; gap: 6px; justify-content: center; margin-top: 8px; }
+  .file-badge {
+    font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 6px;
+    background: var(--grad-soft);
+    color: var(--accent-purple);
+    border: 1px solid #e9d5ff;
+  }
+  #file-input { display: none; }
+
+  /* BUTTON */
+  .btn-analyze {
+    width: 100%;
+    background: var(--grad-main);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(99,102,241,0.35);
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .btn-analyze:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+  .btn-analyze:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .spinner {
+    width: 15px; height: 15px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* RESULT */
+  .result-panel { display: flex; flex-direction: column; gap: 16px; }
+
+  .result-card {
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    border: 1.5px solid var(--border);
+    background: #fafbff;
+    box-shadow: var(--shadow);
+    text-align: center;
+    min-height: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+  }
+  .result-card.loading {
+    border-color: #c4b5fd;
+    background: linear-gradient(135deg, #f5f3ff, #fdf4ff);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.65} }
+  .result-card.spam { background: var(--spam-bg); border-color: var(--spam-border); }
+  .result-card.safe { background: var(--safe-bg); border-color: var(--safe-border); }
+
+  .result-icon { font-size: 42px; margin-bottom: 10px; }
+  .result-verdict { font-size: 22px; font-weight: 800; }
+  .result-card.spam .result-verdict { color: var(--spam-text); }
+  .result-card.safe .result-verdict { color: var(--safe-text); }
+  .result-card.loading .result-verdict,
+  .result-card.idle .result-verdict { color: var(--text-muted); font-size: 14px; font-weight: 500; }
+
+  /* CONFIDENCE */
+  .detail-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    display: none;
+  }
+  .detail-card.show { display: block; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .confidence-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .confidence-val { font-size: 30px; font-weight: 800; }
+  .confidence-desc { font-size: 12px; color: var(--text-muted); }
+
+  .conf-bar { height: 7px; border-radius: 7px; background: var(--border); overflow: hidden; margin-bottom: 18px; }
+  .conf-fill { height: 100%; border-radius: 7px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+
+  .votes-grid { display: flex; flex-wrap: wrap; gap: 7px; }
+  .vote-chip {
+    font-size: 11px; font-weight: 600;
+    padding: 4px 11px; border-radius: 20px; border: 1px solid;
+  }
+  .vote-chip.spam-vote { background: #fff1f2; border-color: #fecdd3; color: #e11d48; }
+  .vote-chip.ham-vote { background: #f0fdf4; border-color: #bbf7d0; color: #16a34a; }
+
+  /* WHY */
+  .why-title { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+  .why-item {
+    display: flex; align-items: flex-start; gap: 9px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+  .why-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .why-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .why-dot.spam { background: var(--spam-text); }
+  .why-dot.safe { background: var(--safe-text); }
+
+  /* HISTORY */
+  .history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .history-clear { font-size: 12px; color: var(--accent); cursor: pointer; font-weight: 500; }
+  .history-clear:hover { text-decoration: underline; }
+  .history-empty { text-align: center; color: var(--text-muted); font-size: 13px; padding: 16px 0; }
+  .history-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .history-item:last-child { border-bottom: none; }
+  .h-badge {
+    font-size: 10px; font-weight: 700;
+    padding: 3px 7px; border-radius: 6px; flex-shrink: 0;
+  }
+  .h-badge.spam { background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; }
+  .h-badge.safe { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+  .h-text { font-size: 12px; color: var(--text-secondary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .h-time { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+  mark.spam-highlight {
+  background: #fecdd3;
+  color: #e11d48;
+  border-radius: 3px;
+  padding: 1px 3px;
+  font-weight: 600;
+}
+.kw-chip {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #e11d48;
+}
+#highlightBox {
+  background: var(--card);
+  border: 1.5px solid var(--spam-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-top: 16px;
+}
+.highlight-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: #e11d48; }
+.highlight-text {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  background: #fafbff;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+.kw-list { display: flex; flex-wrap: wrap; gap: 6px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">🛡️</div>
+    <div>
+      <div class="logo-name">SpamShield AI</div>
+      <div class="logo-sub">Hệ thống phát hiện spam bằng AI</div>
+    </div>
+  </div>
+  <div class="topbar-badge">⚡ 5 Mô hình AI · Weighted Voting</div>
+</div>
+
+<div class="container">
+
+  <!-- LEFT -->
+  <div style="display:flex;flex-direction:column;gap:20px;">
+
+    <!-- INPUT CARD -->
+    <div class="card">
+      <div class="card-title">📝 Nhập Nội Dung Email</div>
+      <div class="card-desc">Dán email hoặc upload file TXT/EML để AI phân tích</div>
+
+      <div class="drop-zone" id="dropZone"
+        onclick="document.getElementById('file-input').click()"
+        ondragover="handleDrag(event,true)"
+        ondragleave="handleDrag(event,false)"
+        ondrop="handleDrop(event)">
+        <div class="drop-zone-icon">📂</div>
+        <div class="drop-zone-text">Kéo thả file hoặc bấm để chọn</div>
+        <div class="drop-zone-sub">Nội dung file sẽ tự động điền xuống bên dưới</div>
+        <div class="drop-zone-badges">
+          <span class="file-badge">TXT</span>
+          <span class="file-badge">EML</span>
+        </div>
+      </div>
+      <input type="file" id="file-input" accept=".txt,.eml" onchange="handleFile(event)">
+
+      <div class="field-label">
+        ✉️ Nội dung email
+        <span class="char-count" id="charCount">0 ký tự</span>
+      </div>
+      <textarea id="text" placeholder="Dán nội dung email vào đây..." oninput="updateCharCount()"></textarea>
+
+      <div class="fields-row">
+        <div>
+          <div class="field-label">📌 Tiêu đề</div>
+          <input type="text" id="subject" placeholder="Subject line...">
+        </div>
+        <div>
+          <div class="field-label">👤 Email người gửi</div>
+          <input type="text" id="emailSender" placeholder="sender@example.com">
+        </div>
+      </div>
+
+      <button class="btn-analyze" id="analyzeBtn" onclick="checkSpam()">
+        <div class="spinner" id="spinner"></div>
+        <span id="btnText">🔍 Phân Tích Ngay</span>
+      </button>
+      <div id="translateBadge" style="display:none;margin-top:10px;align-items:center;gap:6px;font-size:12px;color:#8b5cf6;font-weight:600;">
+  🌐 Đã tự động dịch sang tiếng Anh để phân tích
+</div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="card">
+      <div class="history-header">
+        <div class="card-title" style="margin:0;">🕐 Lịch sử kiểm tra</div>
+        <div class="history-clear" onclick="clearHistory()">Xóa tất cả</div>
+      </div>
+      <div id="historyList">
+        <div class="history-empty">Chưa có lịch sử kiểm tra</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT -->
+  <div class="result-panel">
+
+    <!-- Verdict -->
+    <div class="result-card idle" id="resultCard">
+      <div class="result-icon" id="resultIcon">🔍</div>
+      <div class="result-verdict" id="resultVerdict">Chờ phân tích...</div>
+    </div>
+
+    <!-- Confidence + votes -->
+    <div class="detail-card" id="confidenceCard">
+      <div class="section-label">Độ tin cậy</div>
+      <div class="confidence-row">
+        <div class="confidence-val" id="confVal">—</div>
+        <div class="confidence-desc" id="confDesc"></div>
+      </div>
+      <div class="conf-bar">
+        <div class="conf-fill" id="confFill" style="width:0%"></div>
+      </div>
+      <div class="section-label">Phiếu bầu từ các mô hình AI</div>
+      <div class="votes-grid" id="votesGrid"></div>
+    </div>
+
+    <!-- Why -->
+    <div class="detail-card" id="whyCard">
+      <div id="highlightBox" style="display:none;">
+        <div class="highlight-title">🔍 Từ khóa spam được phát hiện</div>
+        <div class="highlight-text" id="highlightContent"></div>
+        <div class="kw-list" id="keywordList"></div>
+    </div>
+      <div class="why-title" id="whyTitle"></div>
+      <div id="whyList"></div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

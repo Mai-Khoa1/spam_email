@@ -1,0 +1,63 @@
+import os
+
+import requests
+
+from spam_detector_ai import __package_name__, __test_version__, __version__
+
+
+def check_package_version(package_name, current_version):
+    """Check if the given package version already exists on PyPI or TestPyPI.
+
+    :param: package_name (str): The name of the package to check.
+    :param: current_version (str): The current version of the package.
+
+    Sets environment variables for GitHub Actions:
+    - version_exists: True if the version already exists, False otherwise.
+    - publish_to_pypi: True if eligible for publishing to PyPI, False otherwise.
+    - publish_to_testpypi: True if eligible for publishing to TestPyPI, False otherwise.
+    """
+
+    # Use __test_version__ flag directly
+    is_test_version = __test_version__
+    pypi_url = "https://test.pypi.org/pypi/" if is_test_version else "https://pypi.org/pypi/"
+
+    version_exists = False
+    publish_to_pypi = False
+    publish_to_testpypi = False
+
+    # Check if the current version exists on the respective PyPI repository
+    response = requests.get(f"{pypi_url}{package_name}/json")
+
+    if response.status_code == 200:
+        # Package exists on PyPI, check if this specific version exists
+        released_versions = response.json()["releases"].keys()
+        if current_version in released_versions:
+            print(f"Version {current_version} already exists on {'TestPyPI' if is_test_version else 'PyPI'}!")
+            version_exists = True
+        else:
+            print(
+                    f"Version {current_version} not found. Ready to publish to {'TestPyPI' if is_test_version else 'PyPI'}.")
+            publish_to_testpypi = is_test_version
+            publish_to_pypi = not is_test_version
+    elif response.status_code == 404:
+        # Package doesn't exist at all - first release
+        print(
+                f"Package {package_name} not found on {'TestPyPI' if is_test_version else 'PyPI'}. Ready for first release.")
+        publish_to_testpypi = is_test_version
+        publish_to_pypi = not is_test_version
+    else:
+        # Network error or other issue
+        print(f"Error checking PyPI (status {response.status_code}). Skipping publish.")
+        version_exists = True  # Fail safe - don't publish if we can't verify
+
+    # Set environment variables for GitHub Actions
+    if "GITHUB_OUTPUT" in os.environ:
+        with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+            f.write(f"version_exists={version_exists}\n")
+            f.write(f"publish_to_pypi={str(publish_to_pypi).lower()}\n")
+            f.write(f"publish_to_testpypi={str(publish_to_testpypi).lower()}\n")
+            f.write(f"version={current_version}\n")
+
+
+if __name__ == "__main__":
+    check_package_version(__package_name__, __version__)
