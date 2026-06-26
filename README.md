@@ -1,9 +1,7 @@
 # spam-email
 
-![Tests](https://github.com/Mai-Khoa1/spam_email/actions/workflows/tests.yml/badge.svg)
 [![Current Release Version](https://img.shields.io/github/release/Mai-Khoa1/spam_email.svg?style=flat-square&logo=github)](https://github.com/Mai-Khoa1/spam_email/releases)
 [![pypi Version](https://img.shields.io/pypi/v/spam-detector-ai.svg?style=flat-square&logo=pypi&logoColor=white)](https://pypi.org/project/spam-detector-ai/)
-
 
 **spam-email** là một ứng dụng web phát hiện spam email sử dụng bỏ phiếu có trọng số từ 5 mô hình Machine Learning. Ứng dụng hỗ trợ cả tiếng Anh và tiếng Việt — văn bản tiếng Việt sẽ được tự động dịch sang tiếng Anh trước khi phân tích.
 
@@ -18,7 +16,6 @@
 - [Kiểm thử](#kiểm-thử)
 - [Cách hoạt động](#cách-hoạt-động)
 - [Đóng góp](#đóng-góp)
-- [Giấy phép](#giấy-phép)
 
 ---
 
@@ -344,7 +341,3 @@ TfidfVectorizer(max_features=1500, min_df=5, max_df=0.7, ngram_range=(1, 2))
 Xem hướng dẫn đóng góp tại [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
-
-## Giấy phép
-
-Dự án được cấp phép theo [MIT License](LICENSE).
