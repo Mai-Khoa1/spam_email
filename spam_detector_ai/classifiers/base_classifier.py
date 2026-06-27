@@ -1,16 +1,20 @@
 # spam_detector_ai/classifiers/base_classifier.py
-
 from abc import ABC, abstractmethod
-
 from joblib import dump, load
 
 
 class BaseClassifier(ABC):
     VECTORIZER_PARAMS = {
-        'max_features': 1500,
-        'min_df': 5,
-        'max_df': 0.7,
-        'ngram_range': (1, 2)
+        'max_features': 10000,
+        'min_df': 2,
+        'max_df': 0.90,
+        'ngram_range': (1, 2),
+        'analyzer': 'word',
+    }
+
+    TFIDF_PARAMS = {
+        **VECTORIZER_PARAMS,
+        'sublinear_tf': True,
     }
 
     def __init__(self):

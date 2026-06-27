@@ -31,26 +31,25 @@ function readFile(file) {
   reader.readAsText(file, 'UTF-8');
 }
 
-function highlightKeywords(text, keywords) {
-  if (!keywords || keywords.length === 0) return escapeHtml(text);
-  let result = escapeHtml(text);
-  const uniqueKeywords = [...new Set(keywords.map(k => String(k).trim()).filter(k => k.length > 1))]
-    .sort((a, b) => b.length - a.length);
-
-  uniqueKeywords.forEach(kw => {
-    const escapedKeyword = escapeHtml(kw).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp('(^|[^\\p{L}\\p{N}_])(' + escapedKeyword + ')(?=$|[^\\p{L}\\p{N}_])', 'giu');
-    result = result.replace(regex, '$1<mark class="spam-highlight">$2</mark>');
-  });
-  return result;
-}
-
 function escapeHtml(text) {
   return text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+function highlightKeywords(text, keywords) {
+  if (!keywords || keywords.length === 0) return escapeHtml(text);
+  let result = escapeHtml(text);
+  const unique = [...new Set(keywords.map(k => String(k).trim()).filter(k => k.length > 1))]
+    .sort((a, b) => b.length - a.length);
+  unique.forEach(kw => {
+    const esc = escapeHtml(kw).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp('(^|[^\\p{L}\\p{N}_])(' + esc + ')(?=$|[^\\p{L}\\p{N}_])', 'giu');
+    result = result.replace(re, '$1<mark class="spam-highlight">$2</mark>');
+  });
+  return result;
 }
 
 function addHistory(text, isSpam) {
@@ -86,14 +85,13 @@ async function checkSpam() {
   const text = document.getElementById('text').value.trim();
   if (!text) { alert('Vui lòng nhập nội dung email cần kiểm tra.'); return; }
 
-  const btn = document.getElementById('analyzeBtn');
-  const spinner = document.getElementById('spinner');
-  const btnText = document.getElementById('btnText');
+  const btn        = document.getElementById('analyzeBtn');
+  const spinner    = document.getElementById('spinner');
+  const btnText    = document.getElementById('btnText');
   const resultCard = document.getElementById('resultCard');
-  const confidenceCard = document.getElementById('confidenceCard');
-  const whyCard = document.getElementById('whyCard');
-  const translateBadge = document.getElementById('translateBadge');
-  const highlightBox = document.getElementById('highlightBox');
+  const confCard   = document.getElementById('confidenceCard');
+  const whyCard    = document.getElementById('whyCard');
+  const hlBox      = document.getElementById('highlightBox');
 
   btn.disabled = true;
   spinner.style.display = 'block';
@@ -101,14 +99,9 @@ async function checkSpam() {
   resultCard.className = 'result-card loading';
   document.getElementById('resultIcon').textContent = '⏳';
   document.getElementById('resultVerdict').textContent = 'AI đang phân tích...';
-  const slowNoticeTimer = setTimeout(() => {
-    btnText.textContent = 'Đang dịch và tìm từ khóa...';
-    document.getElementById('resultVerdict').textContent = 'Đang dịch và căn highlight...';
-  }, 4500);
-  confidenceCard.classList.remove('show');
+  confCard.classList.remove('show');
   whyCard.classList.remove('show');
-  if (translateBadge) translateBadge.style.display = 'none';
-  if (highlightBox) highlightBox.style.display = 'none';
+  if (hlBox) hlBox.style.display = 'none';
 
   try {
     const res = await fetch('/check', {
@@ -121,14 +114,9 @@ async function checkSpam() {
     });
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
     const data = await res.json();
     const isSpam = data.is_spam;
     const pct = Math.round((data.weighted_score || 0) * 100);
-
-    if (translateBadge && data.translated) {
-      translateBadge.style.display = 'inline-flex';
-    }
 
     // Verdict
     resultCard.className = 'result-card ' + (isSpam ? 'spam' : 'safe');
@@ -136,7 +124,7 @@ async function checkSpam() {
     document.getElementById('resultVerdict').textContent = isSpam ? 'Email Spam!' : 'Email An Toàn';
 
     // Confidence
-    confidenceCard.classList.add('show');
+    confCard.classList.add('show');
     document.getElementById('confVal').textContent = pct + '%';
     document.getElementById('confVal').style.color = isSpam ? '#e11d48' : '#16a34a';
     document.getElementById('confDesc').textContent = isSpam ? 'Khả năng là spam' : 'Khả năng an toàn';
@@ -152,24 +140,23 @@ async function checkSpam() {
       return `<span class="vote-chip ${s ? 'spam-vote' : 'ham-vote'}">${s ? '🚨' : '✅'} ${v}</span>`;
     }).join('');
 
-    // Highlight keywords nếu là spam
-    if (isSpam && highlightBox) {
-      const alignedTerms = data.highlight_terms || [];
-      const modelKeywords = data.model_keywords || [];
-      const terms = data.translated ? alignedTerms : modelKeywords;
-
-      if (terms.length > 0) {
-        document.getElementById('highlightContent').innerHTML = highlightKeywords(text, terms);
-        document.getElementById('keywordList').innerHTML = terms.map(k =>
+    // Highlight keywords
+    whyCard.classList.add('show');
+    if (isSpam && hlBox) {
+      const keywords = data.model_keywords || [];
+      if (keywords.length > 0) {
+        document.getElementById('highlightTitle').textContent = '🔍 Từ khóa spam được phát hiện';
+        document.getElementById('highlightContent').innerHTML = highlightKeywords(text, keywords);
+        document.getElementById('keywordList').innerHTML = keywords.map(k =>
           `<span class="kw-chip">🔴 ${k}</span>`
         ).join('');
-        highlightBox.style.display = 'block';
+        hlBox.style.display = 'block';
       }
     }
 
-    // Why
-    whyCard.classList.add('show');
-    document.getElementById('whyTitle').textContent = isSpam ? '⚠️ Tại sao bị đánh dấu spam?' : '✅ Tại sao email này an toàn?';
+    // Lý do
+    document.getElementById('whyTitle').textContent = isSpam
+      ? '⚠️ Tại sao bị đánh dấu spam?' : '✅ Tại sao email này an toàn?';
     const reasons = isSpam ? [
       'Chứa từ khóa đáng ngờ thường thấy trong spam',
       'Ngôn ngữ mang tính khẩn cấp hoặc cám dỗ bất thường',
@@ -193,7 +180,6 @@ async function checkSpam() {
     document.getElementById('resultIcon').textContent = '❌';
     document.getElementById('resultVerdict').textContent = 'Lỗi kết nối, thử lại!';
   } finally {
-    clearTimeout(slowNoticeTimer);
     btn.disabled = false;
     spinner.style.display = 'none';
     btnText.textContent = '🔍 Phân Tích Ngay';

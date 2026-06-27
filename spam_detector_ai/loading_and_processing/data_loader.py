@@ -8,7 +8,7 @@ class DataLoader:
         if not data_path.endswith('.csv'):
             raise ValueError("Only CSV files are supported")
         try:
-            self.data = pd.read_csv(data_path)
+            self.data = pd.read_csv(data_path, encoding='utf-8')
         except FileNotFoundError:
             raise FileNotFoundError(f"The file at {data_path} was not found.")
         except Exception as e:

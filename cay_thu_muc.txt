@@ -1,0 +1,68 @@
+Folder PATH listing for volume CV
+Volume serial number is 0000004A BA61:4DC4
+D:.
+|   app.py
+|   cay_thu_muc.txt
+|   check_version.py
+|   CONTRIBUTING.md
+|   MANIFEST.in
+|   README.md
+|   requirements.txt
+|   setup.cfg
+|   setup.py
+|   
++---screenshots
+|       spam-detection-api-example.png
+|       
++---spam_detector_ai
+|   |   logger_config.py
+|   |   trainer.py
+|   |   __init__.py
+|   |   
+|   +---classifiers
+|   |       base_classifier.py
+|   |       classifier_types.py
+|   |       logistic_regression_classifier.py
+|   |       naive_bayes_classifier.py
+|   |       random_forest_classifier.py
+|   |       svm_classifier.py
+|   |       xgb_classifier.py
+|   |       __init__.py
+|   |       
+|   +---data
+|   |       spam.csv
+|   |       
+|   +---loading_and_processing
+|   |       data_loader.py
+|   |       preprocessor.py
+|   |       __init__.py
+|   |       
+|   +---prediction
+|   |       performance.py
+|   |       predict.py
+|   |       __init__.py
+|   |       
+|   +---tests
+|   |       launcher.py
+|   |       py_test.py
+|   |       test.py
+|   |       test_dataloader.py
+|   |       test_preprocessor.py
+|   |       __init__.py
+|   |       
+|   +---training
+|   |       train_models.py
+|   |       __init__.py
+|   |       
+|   \---tuning
+|           fine_tuning_logistic_regression.py
+|           fine_tuning_svm.py
+|           fine_tuning_xgb.py
+|           __init__.py
+|           
++---static
+|       app.js
+|       
+\---templates
+        index.html
+        

@@ -1,11 +1,11 @@
-# performance.py
+# performance.py - cập nhật tự động sau khi train
 
 class ModelAccuracy:
-    NAIVE_BAYES = 0.8679
-    RANDOM_FOREST = 0.9750
-    SVM = 0.9774
-    LOGISTIC_REG = 0.9708
-    XGB = 0.9711
+    NAIVE_BAYES   = 1.0
+    RANDOM_FOREST = 0.9524
+    SVM           = 1.0
+    LOGISTIC_REG  = 0.9762
+    XGB           = 0.881
 
     @classmethod
     def total_accuracy(cls):
