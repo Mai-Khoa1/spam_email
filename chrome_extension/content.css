@@ -1,0 +1,321 @@
+/* Giao diện nút Check Spam trên Gmail */
+.spam-checker-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0 15px 0;
+  padding: 8px 12px;
+  background: rgba(241, 243, 244, 0.6);
+  border-radius: 8px;
+  border-left: 4px solid #6366f1;
+  font-family: 'Google Sans', Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+}
+
+.spam-check-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: #ffffff !important;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.spam-check-btn:hover {
+  background: linear-gradient(135deg, #4f46e5, #9333ea);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(99, 102, 241, 0.3);
+}
+
+.spam-check-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
+}
+
+.spam-check-btn:disabled {
+  background: #cbd5e1;
+  color: #64748b !important;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Biểu tượng quay tròn khi Loading */
+.spam-check-btn.loading .spam-btn-icon {
+  display: inline-block;
+  animation: spam-spin 1s linear infinite;
+}
+
+@keyframes spam-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Nhãn kết quả hiển thị ngay dòng (Inline Badge) */
+.spam-inline-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  animation: spam-fade-in 0.3s ease;
+}
+
+.spam-inline-badge.is-spam {
+  background-color: #fee2e2;
+  color: #ef4444;
+  border: 1px solid #fca5a5;
+}
+
+.spam-inline-badge.is-ham {
+  background-color: #d1fae5;
+  color: #10b981;
+  border: 1px solid #6ee7b7;
+}
+
+/* Bảng thông báo kết quả nổi (Overlay Card) */
+.spam-overlay-card {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 350px;
+  background: rgba(15, 23, 42, 0.85); /* Slate 900 */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  color: #f8fafc; /* Slate 50 */
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  z-index: 999999;
+  font-family: 'Google Sans', Roboto, system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.spam-overlay-card.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.spam-overlay-card.closing {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+}
+
+/* Tiêu đề bảng thông báo */
+.spam-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(30, 41, 59, 0.5); /* Slate 800 */
+}
+
+.spam-card-title {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  background: linear-gradient(to right, #a5b4fc, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.spam-card-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 20px;
+  font-weight: 300;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.spam-card-close:hover {
+  color: #f1f5f9;
+}
+
+/* Phần nội dung bảng thông báo */
+.spam-card-body {
+  padding: 18px;
+}
+
+.error-body {
+  color: #fda4af;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.spam-error-tips {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(244, 63, 94, 0.1);
+  border-radius: 6px;
+  border-left: 3px solid #f43f5e;
+}
+
+.spam-error-tips ul {
+  margin: 6px 0 0 0;
+  padding-left: 18px;
+}
+
+/* Khung hiển thị kết quả chính */
+.spam-verdict-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.spam-verdict-banner.verdict-spam {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(225, 29, 72, 0.2));
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.spam-verdict-banner.verdict-ham {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.verdict-icon {
+  font-size: 24px;
+}
+
+.verdict-text-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.verdict-status {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.spam-verdict-banner.verdict-spam .verdict-status {
+  color: #fca5a5;
+}
+
+.spam-verdict-banner.verdict-ham .verdict-status {
+  color: #a7f3d0;
+}
+
+.verdict-sub {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+/* Thang đo phần trăm (Confidence Progress Bar) */
+.spam-metric-section {
+  margin-bottom: 16px;
+}
+
+.spam-metric-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #cbd5e1;
+  margin-bottom: 6px;
+}
+
+.spam-progress-bg {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.spam-progress-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.spam-progress-bar.bar-spam {
+  background: linear-gradient(90deg, #ef4444, #f43f5e);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+.spam-progress-bar.bar-ham {
+  background: linear-gradient(90deg, #10b981, #059669);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+/* Danh sách từ khóa */
+.spam-section-title {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.spam-keywords-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+  max-height: 100px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Thanh cuộn cho danh sách từ khóa */
+.spam-keywords-list::-webkit-scrollbar {
+  width: 4px;
+}
+.spam-keywords-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.spam-keyword-tag {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #e2e8f0;
+  transition: all 0.2s;
+}
+
+.spam-keyword-tag:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+/* Chân bảng thông báo */
+.spam-footer-info {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 10px;
+  font-size: 11px;
+  color: #64748b;
+  text-align: right;
+}
+
+@keyframes spam-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

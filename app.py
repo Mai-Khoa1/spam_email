@@ -4,12 +4,15 @@ from pathlib import Path
 import joblib
 import numpy as np
 from flask import Flask, jsonify, render_template, request
+from flask_cors import CORS
 
 from spam_detector_ai.loading_and_processing.preprocessor import Preprocessor
 from spam_detector_ai.prediction.predict import VotingSpamDetector
 
 app = Flask(__name__)
+CORS(app)
 detector = VotingSpamDetector()
+
 
 BASE_DIR = Path(__file__).parent / 'spam_detector_ai'
 _preprocessor = Preprocessor()

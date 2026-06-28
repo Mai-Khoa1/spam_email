@@ -11,6 +11,7 @@
 - [Cài đặt](#cài-đặt)
 - [Chạy ứng dụng](#chạy-ứng-dụng)
 - [Cách sử dụng API](#cách-sử-dụng-api)
+- [Chrome Extension](#chrome-extension)
 - [Cấu trúc dự án](#cấu-trúc-dự-án)
 - [Huấn luyện mô hình](#huấn-luyện-mô-hình)
 - [Kiểm thử](#kiểm-thử)
@@ -24,9 +25,10 @@
 - Phân tích email bằng **5 mô hình ML**: Naive Bayes, Random Forest, SVM, Logistic Regression, XGBoost
 - **Bỏ phiếu có trọng số** dựa trên độ chính xác của từng mô hình
 - **Hỗ trợ tiếng Việt**: tự động phát hiện và dịch văn bản tiếng Việt
-- **Tô sáng từ khoá spam** trực tiếp trên văn bản gốc (kể cả tiếng Việt)
+- Tô sáng từ khoá spam trực tiếp trên văn bản gốc (kể cả tiếng Việt)
 - Giao diện web kéo-thả file và lịch sử kiểm tra
 - API JSON đơn giản, dễ tích hợp
+- **Tích hợp Chrome Extension (Manifest V3)**: Chèn nút kiểm tra spam trực tiếp vào giao diện đọc thư của Gmail, hiển thị kết quả phân tích bằng bảng nổi (Overlay Card) kính mờ cực kỳ đẹp mắt.
 
 ---
 
@@ -159,10 +161,33 @@ console.log("Score:", data.weighted_score);
 
 ---
 
+## Chrome Extension
+
+Dự án đi kèm một **Chrome Extension (Manifest V3)** cho phép bạn kiểm tra email spam trực tiếp trên giao diện của Gmail.
+
+### Cài đặt và sử dụng:
+
+1. Đảm bảo Flask API đã được chạy và hỗ trợ CORS:
+   ```bash
+   pip install flask-cors
+   python app.py
+   ```
+2. Truy cập **`chrome://extensions/`** trên Google Chrome.
+3. Bật **Developer mode** ở góc trên cùng bên phải.
+4. Chọn **Load unpacked** và chọn thư mục `chrome_extension` trong dự án này.
+5. Truy cập [Gmail](https://mail.google.com/), mở một email bất kỳ và click vào nút **🤖 Check Spam** được tự động chèn vào đầu thư để xem kết quả.
+
+---
+
 ## Cấu trúc dự án
 
 ```
 spam-detection-project/
+├── chrome_extension/               # Chrome Extension (Manifest V3) cho Gmail
+│   ├── manifest.json
+│   ├── background.js
+│   ├── content.js
+│   └── content.css
 ├── app.py                          # Flask app: routes, dịch tiếng Việt, trích keyword
 ├── requirements.txt
 ├── static/
